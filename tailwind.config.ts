@@ -11,7 +11,14 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        'blue01': '#0154fa',
+        'blue02': "4986fb",
       },
+      fontFamily: {
+        lexend: ['Lexend', 'sans-serif'],
+        titan: ['Titan One', 'serif'],
+      },
+
     },
   },
   plugins: [],
