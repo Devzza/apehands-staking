@@ -10,9 +10,19 @@ import { chain } from "@/app/chain";
 import { PiHandEye } from "react-icons/pi";
 import { NavRewards } from "./NavRewards";
 import { SubNavRewards } from "./SubNavRewards";
+import { createWallet } from "thirdweb/wallets";
 
 
 export default function Navbar() {
+
+    const wallets = [
+        createWallet("io.metamask"),
+        createWallet("com.coinbase.wallet"),
+        createWallet("me.rainbow"),
+        createWallet("io.rabby"),
+        createWallet("app.phantom"),
+      ];
+      
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -61,8 +71,10 @@ export default function Navbar() {
               <ConnectButton
                   client={client}
                   chain={chain}
+                  wallets={wallets}
                   connectModal={{
-                      size: "wide"
+                      size: "wide",
+                      showThirdwebBranding: false,
                   }} />
           </div>
 

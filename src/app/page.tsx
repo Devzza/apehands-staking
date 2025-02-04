@@ -15,14 +15,12 @@ export default function Home() {
             height={50} />
 
           <Image
-            style={{
-              marginBottom: "20px",
-              marginTop: "10px"
-            }}
+            
+            className="mb-[20px] mt-[10px]"
             src="/apehandslogo.svg"
             alt="Ape Hands logo"
-            width={250}
-            height={250}
+            width={200}
+            height={200}
             priority />
 
 
