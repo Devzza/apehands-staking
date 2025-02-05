@@ -118,12 +118,15 @@ export default function Navbar() {
                   </div>
                   <div className="mt-4 space-y-4">
                       <div className="flex flex-col justify-center items-center font-lexend">
-                          <ConnectButton
-                              client={client}
-                              chain={chain}
-                              connectModal={{
-                                  size: "wide"
-                              }} /></div>
+                      <ConnectButton
+                  client={client}
+                  chain={chain}
+                  wallets={wallets}
+                  connectModal={{
+                      size: "wide",
+                      showThirdwebBranding: false,
+                  }} />
+                  </div>
                       <a href="/" className="block text-lg px-4 py-2 font-lexend font-bold text-white hover:text-gray-400">
                           Home
                       </a>
