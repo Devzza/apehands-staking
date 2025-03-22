@@ -38,7 +38,7 @@ export const Staking = () => {
                         // Si la wallet es la propietaria, obtenemos la metadata del NFT
                         const nft = await getNFTs({
                             contract: NFT_CONTRACT,
-                            start: tokenId.toString(), // Convertir el bigint a string para usarlo en getNFTs
+                            start: tokenId,
                             count: 1,  // Solo obtenemos ese NFT
                         });
     
