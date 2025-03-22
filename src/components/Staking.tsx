@@ -21,14 +21,14 @@ export const Staking = () => {
     const getOwnedNFTs = async () => {
         setIsLoading(true); // Activar loading antes de la consulta
         let ownedNFTs: NFT[] = [];
-        
+    
         try {
-            // Usamos toString() para convertir el BigNumber a una cadena y luego lo convertimos a un número
+            // Usamos toString() para convertir el BigNumber a una cadena y luego lo convertimos a bigint
             const totalNFTSupply = await totalSupply({ contract: NFT_CONTRACT });
-            const totalSupplyNumber = parseInt(totalNFTSupply.toString()); // Convertir a número
+            const totalSupplyBigInt: bigint = BigInt(totalNFTSupply.toString()); // Convertir a bigint
     
             // Verificar cada NFT antes de intentar obtener la metadata
-            for (let tokenId = 0; tokenId < totalSupplyNumber; tokenId++) {
+            for (let tokenId = 0n; tokenId < totalSupplyBigInt; tokenId++) { // Usar bigint en el for
                 try {
                     // Verificamos si el propietario es el que está conectado
                     const owner = await ownerOf({
@@ -68,6 +68,7 @@ export const Staking = () => {
             getOwnedNFTs();
         }
     }, [account]);
+    
 
     
 
