@@ -28,7 +28,7 @@ export const Staking = () => {
             const totalSupplyBigInt: bigint = BigInt(totalNFTSupply.toString()); // Convertir a bigint
     
             // Verificar cada NFT antes de intentar obtener la metadata
-            for (let tokenId = 0n; tokenId < totalSupplyBigInt; tokenId++) { // Usar bigint en el for
+            for (let tokenId = BigInt(0); tokenId < totalSupplyBigInt; tokenId++) {                
                 try {
                     // Verificamos si el propietario es el que está conectado
                     const owner = await ownerOf({
