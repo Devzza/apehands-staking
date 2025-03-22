@@ -16,19 +16,17 @@ export const Staking = () => {
     const account = useActiveAccount();
 
     const [ownedNFTs, setOwnedNFTs] = useState<NFT[]>([]);
-    const [isLoading, setIsLoading] = useState(false); // Estado de carga
+    const [isLoading, setIsLoading] = useState(false); 
     
     const getOwnedNFTs = async () => {
-        setIsLoading(true); // Activar loading antes de la consulta
+        setIsLoading(true);
         let ownedNFTs: NFT[] = [];
-    
+        
         try {
-            // Usamos toString() para convertir el BigNumber a una cadena y luego lo convertimos a bigint
             const totalNFTSupply = await totalSupply({ contract: NFT_CONTRACT });
             const totalSupplyBigInt: bigint = BigInt(totalNFTSupply.toString()); // Convertir a bigint
-    
-            // Verificar cada NFT antes de intentar obtener la metadata
-            for (let tokenId = BigInt(0); tokenId < totalSupplyBigInt; tokenId++) {                
+            
+            for (let tokenId = BigInt(0); tokenId < totalSupplyBigInt; tokenId++) {
                 try {
                     // Verificamos si el propietario es el que está conectado
                     const owner = await ownerOf({
@@ -40,7 +38,7 @@ export const Staking = () => {
                         // Si la wallet es la propietaria, obtenemos la metadata del NFT
                         const nft = await getNFTs({
                             contract: NFT_CONTRACT,
-                            start: tokenId,
+                            start: tokenId.toString(), // Convertir el bigint a string para usarlo en getNFTs
                             count: 1,  // Solo obtenemos ese NFT
                         });
     
@@ -81,15 +79,16 @@ export const Staking = () => {
         params: [account?.address || ""]
     });
 
-    const [selectedNFTs, setSelectedNFTs] = useState<number[]>([]); // Aquí guardamos los seleccionados
+    const [selectedNFTs, setSelectedNFTs] = useState<bigint[]>([]); // Ahora guardamos los seleccionados como bigint
 
-    const toggleSelectNFT = (tokenId: number) => {
+    const toggleSelectNFT = (tokenId: bigint) => {
         setSelectedNFTs((prev) =>
             prev.includes(tokenId)
                 ? prev.filter((id) => id !== tokenId) // Si ya está seleccionado, lo quitamos
                 : [...prev, tokenId] // Si no está seleccionado, lo añadimos
         );
     };
+    
 
 
     // check if staking contract is approved
@@ -204,61 +203,61 @@ export const Staking = () => {
 
         {/* Botón de Stake Selected */}
         {selectedNFTs.length > 0 && (
-            <TransactionButton
-                transaction={() => {
-                    const tokenIds = selectedNFTs.map(id => Number(id));
-                    return prepareContractCall({
-                        contract: STAKING_CONTRACT,
-                        method: "function stake(uint256[] _tokenIds)",
-                        params: [tokenIds],
-                    });
-                }}
-                onTransactionConfirmed={async () => {
-                    alert("NFTs staked!");
-                    await refetchStakedInfo();
-                    await getOwnedNFTs();
-                    setSelectedNFTs([]);
-                    setOwnedNFTs(ownedNFTs.filter(nft => !selectedNFTs.includes(Number(nft.id))));
-                }}
-                style={{
-                    width: "100%",
-                    backgroundColor: "#000000",
-                    color: "white",
-                    padding: "10px",
-                    borderRadius: "8px",
-                    marginBottom: "15px"
-                }}
-            >
-                Stake selected NFTs ({selectedNFTs.length})
-            </TransactionButton>
-        )}
-
-        {/* Botón de Stake All */}
-        <TransactionButton
-            transaction={() => {
-                const tokenIds = ownedNFTs.map((nft) => Number(nft.id));
-                return prepareContractCall({
-                    contract: STAKING_CONTRACT,
-                    method: "stake",
-                    params: [tokenIds],
-                });
-            }}
-            onTransactionConfirmed={() => {
-                alert("All NFTs staked!");
-                refetchStakedInfo();
-                getOwnedNFTs();
-            }}
-            style={{
-                width: "100%",
-                backgroundColor: "#03a9f4",
-                color: "white",
-                padding: "10px",
-                borderRadius: "8px",
-                marginBottom: "15px"
-            }}
-        >
-            Stake All
-        </TransactionButton>
+               <TransactionButton
+               transaction={() => {
+                   const tokenIds = selectedNFTs; 
+                   return prepareContractCall({
+                       contract: STAKING_CONTRACT,
+                       method: "function stake(uint256[] _tokenIds)",
+                       params: [tokenIds],
+                   });
+               }}
+               onTransactionConfirmed={async () => {
+                   alert("NFTs staked!");
+                   await refetchStakedInfo();
+                   await getOwnedNFTs();
+                   setSelectedNFTs([]);
+                   setOwnedNFTs(ownedNFTs.filter(nft => !selectedNFTs.includes(nft.id)));
+               }}
+               style={{
+                   width: "100%",
+                   backgroundColor: "#000000",
+                   color: "white",
+                   padding: "10px",
+                   borderRadius: "8px",
+                   marginBottom: "15px"
+               }}
+           >
+               Stake selected NFTs ({selectedNFTs.length})
+           </TransactionButton>
+       )}
+       
+       {/* Botón de Stake All */}
+       <TransactionButton
+           transaction={() => {
+               const tokenIds = ownedNFTs.map((nft) => BigInt(nft.id)); 
+               return prepareContractCall({
+                   contract: STAKING_CONTRACT,
+                   method: "stake",
+                   params: [tokenIds],
+               });
+           }}
+           onTransactionConfirmed={() => {
+               alert("All NFTs staked!");
+               refetchStakedInfo();
+               getOwnedNFTs();
+           }}
+           style={{
+               width: "100%",
+               backgroundColor: "#03a9f4",
+               color: "white",
+               padding: "10px",
+               borderRadius: "8px",
+               marginBottom: "15px"
+           }}
+       >
+           Stake All
+       </TransactionButton>
     </>
 )}
 
@@ -278,7 +277,7 @@ export const Staking = () => {
                                         refetchOwnedNFTs={getOwnedNFTs}
                                         refetchStakedInfo={refetchStakedInfo}
                                         isApprovedForAll={isApprovedForAll}
-                                        isSelected={selectedNFTs.includes(Number(nft.id))}
+                                        isSelected={selectedNFTs.includes(nft.id)}
                                         toggleSelectNFT={toggleSelectNFT}
                                     />
                                 ))
@@ -304,7 +303,7 @@ export const Staking = () => {
         prepareContractCall({
             contract: STAKING_CONTRACT,
             method: "withdraw",
-            params: [stakedInfo[0].map((id: bigint) => Number(id))], // Convertimos a Number directamente
+            params: [stakedInfo[0]], 
         })
     }
     onTransactionConfirmed={() => {

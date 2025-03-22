@@ -17,7 +17,7 @@ type OwnedNFTsProps = {
     refetchStakedInfo: () => void;
     isApprovedForAll: boolean;  
     isSelected: boolean;
-    toggleSelectNFT: (id: number) => void;
+    toggleSelectNFT: (id: bigint) => void;
 };
 
 export const NFTCard = ({ nft, refetchOwnedNFTs, refetchStakedInfo, isApprovedForAll, isSelected, toggleSelectNFT }: OwnedNFTsProps) => {
@@ -28,7 +28,7 @@ export const NFTCard = ({ nft, refetchOwnedNFTs, refetchStakedInfo, isApprovedFo
     return (
         <div className="flex flex-col items-center justify-items-center justify-center">
 <div 
-onClick={() => toggleSelectNFT(Number(nft.id))}
+onClick={() => toggleSelectNFT(nft.id)}
 className="cursor-pointer relative"
     >
         {/* Icono de selección en la esquina superior derecha */}
