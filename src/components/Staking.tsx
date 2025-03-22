@@ -208,7 +208,7 @@ export const Staking = () => {
                    const tokenIds = selectedNFTs; 
                    return prepareContractCall({
                        contract: STAKING_CONTRACT,
-                       method: "function stake(uint256[] _tokenIds)",
+                       method: "stake",
                        params: [tokenIds],
                    });
                }}

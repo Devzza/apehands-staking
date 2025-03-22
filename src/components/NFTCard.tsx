@@ -15,7 +15,7 @@ type OwnedNFTsProps = {
     nft: NFT;
     refetchOwnedNFTs: () => void;
     refetchStakedInfo: () => void;
-    isApprovedForAll: boolean;  
+    isApprovedForAll: boolean | undefined;  
     isSelected: boolean;
     toggleSelectNFT: (id: bigint) => void;
 };
