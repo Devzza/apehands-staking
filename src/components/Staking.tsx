@@ -217,7 +217,7 @@ export const Staking = () => {
                     await refetchStakedInfo();
                     await getOwnedNFTs();
                     setSelectedNFTs([]);
-                    setOwnedNFTs(ownedNFTs.filter(nft => !selectedNFTs.includes(nft.id)));
+                    setOwnedNFTs(ownedNFTs.filter(nft => !selectedNFTs.includes(Number(nft.id))));
                 }}
                 style={{
                     width: "100%",
@@ -277,7 +277,7 @@ export const Staking = () => {
                                         refetchOwnedNFTs={getOwnedNFTs}
                                         refetchStakedInfo={refetchStakedInfo}
                                         isApprovedForAll={isApprovedForAll}
-                                        isSelected={selectedNFTs.includes(nft.id)}
+                                        isSelected={selectedNFTs.includes(Number(nft.id))}
                                         toggleSelectNFT={toggleSelectNFT}
                                     />
                                 ))

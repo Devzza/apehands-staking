@@ -23,12 +23,13 @@ type OwnedNFTsProps = {
 export const NFTCard = ({ nft, refetchOwnedNFTs, refetchStakedInfo, isApprovedForAll, isSelected, toggleSelectNFT }: OwnedNFTsProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isApproved, setIsApproved] = useState(false);
+    
 
     return (
         <div className="flex flex-col items-center justify-items-center justify-center">
 <div 
-        onClick={() => toggleSelectNFT(nft.id)} 
-        className="cursor-pointer relative"
+onClick={() => toggleSelectNFT(Number(nft.id))}
+className="cursor-pointer relative"
     >
         {/* Icono de selección en la esquina superior derecha */}
         <div className="absolute top-2 right-2 text-white text-2xl z-10">
