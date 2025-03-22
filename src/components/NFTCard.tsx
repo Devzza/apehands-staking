@@ -7,27 +7,51 @@ import { IoClose } from "react-icons/io5";
 import styles from "@/app/page.module.css";
 import Link from "next/link";
 import { NFT_CONTRACT, STAKING_CONTRACT } from "../../utils/contracts";
+import { FaRegCircle, FaRegCircleCheck } from "react-icons/fa6";
+
 
 
 type OwnedNFTsProps = {
     nft: NFT;
     refetchOwnedNFTs: () => void;
     refetchStakedInfo: () => void;
+    isApprovedForAll: boolean;  
+    isSelected: boolean;
+    toggleSelectNFT: (id: number) => void;
 };
 
-export const NFTCard = ({ nft, refetchOwnedNFTs, refetchStakedInfo }: OwnedNFTsProps) => {
+export const NFTCard = ({ nft, refetchOwnedNFTs, refetchStakedInfo, isApprovedForAll, isSelected, toggleSelectNFT }: OwnedNFTsProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isApproved, setIsApproved] = useState(false);
 
     return (
         <div className="flex flex-col items-center justify-items-center justify-center">
-            <MediaRenderer
-                client={client}
-                src={nft.metadata.image}
-                className="shadow-[5px_5px_0px_0px_rgba(53,35,65)] border-4 border-solid border-[#352341]"
-            style={{borderRadius: "15px", width: "200px", height: "200px", marginBottom: "20px"}}></MediaRenderer>
+<div 
+        onClick={() => toggleSelectNFT(nft.id)} 
+        className="cursor-pointer relative"
+    >
+        {/* Icono de selección en la esquina superior derecha */}
+        <div className="absolute top-2 right-2 text-white text-2xl z-10">
+            {isSelected ? <FaRegCircleCheck className="text-green-500" /> : <FaRegCircle className="text-white/80" />}
+        </div>
+
+        {/* Imagen del NFT */}
+        <MediaRenderer
+            client={client}
+            src={nft.metadata.image}
+            className="shadow-[5px_5px_0px_0px_rgba(53,35,65)]"
+            style={{
+                borderRadius: "15px",
+                width: "200px",
+                height: "200px",
+                marginBottom: "20px"
+            }}
+        />
+    </div>
+
             
             <p className=" text-lg font-bold">{nft.metadata.name}</p>
+
                 
             <div className="w-full h-24 bg-no-repeat bg-contain bg-center flex items-center justify-center font-lexend font-bold text-white text-lg"
                 style={{backgroundImage:"url('/buttonmint.svg", width:"auto" }}>
@@ -96,7 +120,7 @@ export const NFTCard = ({ nft, refetchOwnedNFTs, refetchStakedInfo }: OwnedNFTsP
                             marginBottom: "10px"
                         }}
                         />
-                        {!isApproved ? (
+                        {!isApproved && !isApprovedForAll ? (
                             <TransactionButton
                             transaction={() => (
                                 approve({

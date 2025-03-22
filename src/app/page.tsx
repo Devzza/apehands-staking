@@ -3,7 +3,7 @@ import Image from "next/image";
 export default function Home() {
   return (
     <><section>
-      <div className="bg-[url('/boredonchain-bg.jpg')] w-full h-screen lg:h-full p-12 lg:p-24 bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center justify-items-center">
+      <div className="bg-[url('/boredonchain-bg.jpg')] w-full h-screen lg:h-screen p-12 lg:p-24 bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center justify-items-center">
 
         <div className="bg-[url('/divhome.svg')] w-full h-[450px] relative flex flex-col items-center justify-center justify-items-center bg-no-repeat bg-contain bg-center">
 

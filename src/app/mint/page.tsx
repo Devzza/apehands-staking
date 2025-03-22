@@ -53,8 +53,7 @@ export default function Claim() {
     return (
     <>  
     <div
-        style={{width:"100%", height:"100%"}}
-        className="bg-gradient-to-br from-blue-600 via-blue-400 to-white">
+        className="bg-gradient-to-br from-blue-600 via-blue-400 to-white w-full h-full">
         
         <NavBar />
 
