@@ -3,13 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { getContractEvents, getContract } from "thirdweb";
-import { ConnectButton, useActiveAccount, useReadContract } from "thirdweb/react";
+import { ConnectButton, MediaRenderer, useActiveAccount, useReadContract } from "thirdweb/react";
 import { AdminAddress, AdminAddress2, NFT_CONTRACT } from "../../../utils/contracts";
 import { STAKING_CONTRACT } from "../../../utils/contracts";
 import { client } from "../client";
 import { chain } from "../chain";
 import NavBar from "@/components/NavBar";
 import { getAllOwners, getTotalClaimedSupply, nextTokenIdToMint } from "thirdweb/extensions/erc721";
+import { getContractMetadata } from "thirdweb/extensions/common";
 
 
 export default function Admin() {
@@ -43,6 +44,13 @@ export default function Admin() {
       const { data: totalNFTSupply, isLoading: isTotalSupplyLoading } = useReadContract( nextTokenIdToMint,
           { contract: handsContract}
       );
+
+      
+    // contract metadata
+    
+    const { data: contractMetadata, isLoading: isContractMetadataLoading } = useReadContract( getContractMetadata,
+      { contract: handsContract}
+  );
 
 
   // Generar lista de tokenIds de 0 a 3332
@@ -255,22 +263,127 @@ const totalWallets = uniqueWallets.length;
         /* Si la wallet es admin */
         <>
               <div className="p-6">
-              <h1 className="text-xl font-bold">Collection summary</h1>
-              <p>
-              <strong> Minted:</strong> {claimedSupply?.toString()}/{totalNFTSupply?.toString()}
+
+                 {/* header */}
+              <div className="flex flex-col lg:flex-row justify-between mt-6">
+                {/* header left side */}
+            <div className="flex flex-col justify-start">
+              <div className="flex flex-col lg:flex-row justify-start">
+              <MediaRenderer
+            client={client}
+            src={contractMetadata?.image}
+            style={{borderRadius: "15px", width: "100px", height: "100px", marginBottom: "20px", marginRight: "20px"}}
+
+            /> 
+            <div>
+              <h1 className="text-black text-[42px] font-lexend font-light">{contractMetadata?.name}</h1>
+              <p className="text-black font-lexend">
+               <a
+                href={`https://apescan.io/address/${handsContract.address}`} // Reemplázalo con la red que uses
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-blue-400 hover:opacity-75 cursor-pointer"
+              >
+                {contract.address}
+              </a> 
               </p>
-              <p><strong>Total Wallets:</strong> {totalWallets}</p>
+            </div>             
+              
+              </div>
+              
+            </div>
+            {/* header right side */}
 
-                <h1 className="text-xl font-bold">Resumen de Stakers</h1>
-                <p><strong>Total wallets:</strong> {walletFrequencies.size}</p>
-                <p><strong>Total staked:</strong> {totalStaked}</p>
-
+            <div className="relative inline-flex items-center justify-start gap-4 group">
                 <button
                   className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
                   onClick={downloadCSV}
                 >
                   Download CSV
                 </button>
+              </div>
+  
+              </div>
+
+                      {/* div for cards */}
+
+
+                      <div className="flex flex-col lg:flex-row items-center w-full space-y-4 lg:space-y-0 lg:space-x-4 mt-[35px] mb-[50px]">
+
+{/*Card 1*/}
+<div className="flex flex-col bg-white rounded-3xl w-full lg:w-1/2 font-lexend">
+  <div className="px-6 py-8 sm:p-10 sm:pb-6">
+    <div className="grid items-center justify-center w-full grid-cols-1 text-left">
+      <div>
+        <h2
+          className="text-lg font-medium tracking-tighter text-gray-600 lg:text-3xl"
+        >
+          NFTs minted
+        </h2>
+      </div>
+      <div className="mt-6">
+      <p>
+    <span className="text-5xl font-light tracking-tight text-black">
+    {claimedSupply?.toString()}
+    </span>
+    <span className="text-base font-medium text-gray-500"> /{totalNFTSupply?.toString()} </span>
+  </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{/*Card 2*/}
+<div className="flex flex-col bg-white rounded-3xl w-full lg:w-1/2  font-lexend">
+  <div className="px-6 py-8 sm:p-10 sm:pb-6">
+    <div className="grid items-center justify-center w-full grid-cols-1 text-left">
+      <div>
+        <h2
+          className="text-lg font-medium tracking-tighter text-gray-600 lg:text-3xl"
+        >
+          NFTs staked
+        </h2>
+      </div>
+      <div className="mt-6">
+      <p>
+    <span className="text-5xl font-light tracking-tight text-black">
+    {totalStaked}
+    </span>
+    <span className="text-base font-medium text-gray-500"> / {walletFrequencies.size} stakers </span>
+  </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{/*Card 3*/}
+<div className="flex flex-col bg-white rounded-3xl w-full lg:w-1/2  font-lexend">
+  <div className="px-6 py-8 sm:p-10 sm:pb-6">
+    <div className="grid items-center justify-center w-full grid-cols-1 text-left">
+      <div>
+        <h2
+          className="text-lg font-medium tracking-tighter text-gray-600 lg:text-3xl"
+        >
+          Total holders
+        </h2>
+      </div>
+      <div className="mt-6">
+      <p>
+    <span className="text-5xl font-light tracking-tight text-black">
+    {totalWallets}
+    </span>
+  </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+</div>
+                  {/* ^^^ End div for cards ^^^ */}
+
 
                 <div className="p-6">
   <h2>Lista de Wallets</h2>

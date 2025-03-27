@@ -11,13 +11,16 @@ import { PiHandEye } from "react-icons/pi";
 import { NavRewards } from "./NavRewards";
 import { SubNavRewards } from "./SubNavRewards";
 import { createWallet } from "thirdweb/wallets";
-import { AdminAddress } from "../../utils/contracts";
+import { AdminAddress, AdminAddress2 } from "../../utils/contracts";
 
 
 
 export default function Navbar() {
     const account = useActiveAccount();
     const adminAddress = AdminAddress;
+      const adminAddress2 = AdminAddress2;
+    
+      const isAdmin = account?.address === adminAddress || account?.address === adminAddress2;
 
     const wallets = [
         createWallet("io.metamask"),
@@ -71,7 +74,7 @@ export default function Navbar() {
                   <a href="/stake" className="hover:bg-yellow-400 px-3 py-2 rounded-md">
                       Stake
                   </a>
-                  {account?.address === adminAddress && (
+                  {isAdmin && (
                   <a href="/admin">
                       Admin
                   </a>
@@ -145,7 +148,7 @@ export default function Navbar() {
                       <a href="/stake" className="block text-lg px-4 py-2 font-lexend font-bold text-white hover:text-gray-400">
                           Stake
                       </a>
-                      {account?.address === adminAddress && (
+                      {isAdmin && (
                   <a href="/admin">
                       Admin
                   </a>
