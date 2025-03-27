@@ -4,16 +4,20 @@ import Link from "next/link";
 import { useState } from "react";
 import { HiMenuAlt1 } from "react-icons/hi";
 import Image from "next/image";
-import { ConnectButton } from "thirdweb/react";
+import { ConnectButton, useActiveAccount } from "thirdweb/react";
 import { client } from "@/app/client";
 import { chain } from "@/app/chain";
 import { PiHandEye } from "react-icons/pi";
 import { NavRewards } from "./NavRewards";
 import { SubNavRewards } from "./SubNavRewards";
 import { createWallet } from "thirdweb/wallets";
+import { AdminAddress } from "../../utils/contracts";
+
 
 
 export default function Navbar() {
+    const account = useActiveAccount();
+    const adminAddress = AdminAddress;
 
     const wallets = [
         createWallet("io.metamask"),
@@ -67,6 +71,11 @@ export default function Navbar() {
                   <a href="/stake" className="hover:bg-yellow-400 px-3 py-2 rounded-md">
                       Stake
                   </a>
+                  {account?.address === adminAddress && (
+                  <a href="/admin">
+                      Admin
+                  </a>
+                    )}
               </div>
               <ConnectButton
                   client={client}
@@ -136,6 +145,12 @@ export default function Navbar() {
                       <a href="/stake" className="block text-lg px-4 py-2 font-lexend font-bold text-white hover:text-gray-400">
                           Stake
                       </a>
+                      {account?.address === adminAddress && (
+                  <a href="/admin">
+                      Admin
+                  </a>
+                    )}
+
                   </div>
               </div>
 

@@ -1,0 +1,105 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { getContractEvents, getContract } from "thirdweb";
+import { ConnectButton, useActiveAccount, useReadContract } from "thirdweb/react";
+import { AdminAddress } from "../../../utils/contracts";
+import { STAKING_CONTRACT } from "../../../utils/contracts";
+import { client } from "../client";
+import { chain } from "../chain";
+import NavBar from "@/components/NavBar";
+
+export default function Admin() {
+  const account = useActiveAccount();
+  const adminAddress = AdminAddress;
+
+  // Obtener contrato de staking
+  const contract = getContract({
+    client: client,
+    chain: chain,
+    address: STAKING_CONTRACT.address,
+  });
+
+  // Generar lista de tokenIds de 0 a 3332
+  const tokenIds = Array.from({ length: 3333 }, (_, i) => i);
+
+  // Llamar a `stakerAddress` para cada tokenId
+  const stakerResults = tokenIds.map((tokenId) =>
+    useReadContract({
+      contract,
+      method: "function stakerAddress(uint256) view returns (address)",
+      params: [tokenId],
+    })
+  );
+
+  // Filtrar solo los tokens que tienen un staker válido
+  const stakers = stakerResults
+    .map(({ data }, index) => ({ tokenId: index, staker: data }))
+    .filter(({ staker }) => staker && staker !== "0x0000000000000000000000000000000000000000");
+
+    const stakersData = stakers.map(({ staker }) =>
+        useReadContract({
+          contract,
+          method:
+            "function stakers(address) view returns (uint64 amountStaked, uint64 conditionIdOflastUpdate, uint128 timeOfLastUpdate, uint256 unclaimedRewards)",
+          params: [staker],
+        })
+      );
+
+      const formattedStakers = stakers.map((stakerObj, index) => ({
+        ...stakerObj,
+        amountStaked: stakersData[index]?.data?.[0] || 0,
+        unclaimedRewards: stakersData[index]?.data?.[3] || 0,
+      }));
+
+  return (
+    <section className="w-full h-full justify-center items-center bg-[#e8e8e8] text-black">
+      {/* Navbar */}
+      <NavBar />
+
+      {/* Si no hay wallet conectada */}
+      {!account ? (
+        <div className="flex flex-col items-center h-screen justify-center font-lexend">
+          <h1 className="mb-[25px] text-lg">Connect your wallet</h1>
+          <div className="mb-[150px]">
+            <ConnectButton client={client} connectModal={{ size: "compact", showThirdwebBranding: false }} />
+          </div>
+        </div>
+      ) : account?.address !== adminAddress ? (
+        /* Si la wallet conectada no es admin */
+        <div className="flex flex-col items-center h-screen justify-center font-lexend">
+          <h1 className="mb-[25px] text-lg">You are not the Admin</h1>
+          <button className="bg-[#212121] rounded-xl h-[50px] mb-[150px] text-white px-4">
+            <Link href={"/"}>Go to Home</Link>
+          </button>
+        </div>
+      ) : (
+        /* Si la wallet es admin */
+        <div className="p-6">
+          <h1 className="text-2xl font-bold">Hola Admin</h1>
+          <h1 className="text-xl font-bold">Lista de Stakers</h1>
+      <ul>
+        {stakers.map(({ tokenId, staker }) => (
+          <li key={tokenId} className="border p-2 rounded mb-2">
+            <p><strong>Token ID:</strong> {tokenId}</p>
+            <p><strong>Staker:</strong> {staker}</p>
+          </li>
+        ))}
+      </ul>
+
+      <ul>
+  {formattedStakers.map(({ tokenId, staker, amountStaked, unclaimedRewards }) => (
+    <li key={tokenId} className="border p-2 rounded mb-2">
+      <p><strong>Token ID:</strong> {tokenId}</p>
+      <p><strong>Staker:</strong> {staker}</p>
+      <p><strong>Amount Staked:</strong> {amountStaked.toString()}</p>
+      <p><strong>Unclaimed Rewards:</strong> {unclaimedRewards.toString()}</p>
+    </li>
+  ))}
+</ul>
+        </div>
+      )}
+    </section>
+  );
+}
