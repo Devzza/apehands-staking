@@ -11,6 +11,9 @@ import { chain } from "../chain";
 import NavBar from "@/components/NavBar";
 import { getAllOwners, getTotalClaimedSupply, nextTokenIdToMint } from "thirdweb/extensions/erc721";
 import { getContractMetadata } from "thirdweb/extensions/common";
+import { createWallet } from "thirdweb/wallets";
+import Footer from "@/components/Footer";
+import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 
 export default function Admin() {
@@ -20,7 +23,13 @@ export default function Admin() {
 
   const isAdmin = account?.address === adminAddress || account?.address === adminAddress2;
 
-
+   const wallets = [
+          createWallet("io.metamask"),
+          createWallet("com.coinbase.wallet"),
+          createWallet("me.rainbow"),
+          createWallet("io.rabby"),
+          createWallet("app.phantom"),
+        ];
 
   // Obtener contrato de staking
   const contract = getContract({
@@ -90,11 +99,14 @@ const walletList = stakers.map(({ staker }) => staker).filter(Boolean) as string
 const totalStaked = Array.from(walletFrequencies.values()).reduce((sum, count) => sum + count, 0);
 
 
-// Función para descargar CSV
-// Función para descargar CSV
 const downloadCSV = () => {
   // Obtener la fecha y hora actual
-  const downloadDate = new Date().toLocaleString().replace(/[\/:]/g, '-'); // Reemplazamos / y : por - para evitar problemas en los nombres de archivos
+  const downloadDate = new Date().toLocaleString().replace(/[\/:]/g, '-'); // Evita caracteres problemáticos en el nombre
+
+  // Filtrar wallets excluyendo la dirección del contrato de staking
+  const filteredWallets = uniqueWallets.filter(
+    (wallet) => wallet.wallet.toLowerCase() !== STAKING_CONTRACT.address.toLowerCase()
+  );
 
   // Contamos el total de staked desde el estado de los stakers
   const totalStaked = Array.from(walletFrequencies.values()).reduce((sum, count) => sum + count, 0);
@@ -106,15 +118,17 @@ const downloadCSV = () => {
     // Resumen de la colección
     `"Resumen de colección"\n` +
     `"Minted: ${claimedSupply?.toString()}/${totalNFTSupply?.toString()}"\n` +
-    `"Total Wallets: ${totalWallets}"\n\n` +
+    `"Total Wallets: ${totalWallets - 1}"\n\n` +
     // Resumen de Stakers
     `"Resumen de Stakers"\n` +
     `"Total wallets: ${walletFrequencies.size}"\n` +
     `"Total staked: ${totalStaked}"\n\n` +
-    // Mapeamos los datos de cada wallet
-    uniqueWallets.map(wallet => {
-      return `${wallet.wallet},${wallet.nftCount},${wallet.staked},${wallet.noStaked}`;
-    }).join("\n");
+    // Encabezado de la tabla
+    `"Wallet, NFT Count, Staked, No Staked"\n` +
+    // Mapeamos los datos de cada wallet filtrada
+    filteredWallets.map(wallet => 
+      `${wallet.wallet},${wallet.nftCount},${wallet.staked},${wallet.noStaked}`
+    ).join("\n");
 
   // Creamos el nombre del archivo con la fecha y hora
   const fileName = `ApeHands Summary - ${downloadDate}.csv`;
@@ -128,6 +142,7 @@ const downloadCSV = () => {
   link.click();
   document.body.removeChild(link);
 };
+
 
 
 // holders sin stake
@@ -231,6 +246,36 @@ useEffect(() => {
 
 const totalWallets = uniqueWallets.length;
 
+const filteredWallets = uniqueWallets.filter(
+  (wallet) => wallet.wallet.toLowerCase() !== STAKING_CONTRACT.address.toLowerCase()
+);
+
+const downloadCSVWallet = () => {
+  // Obtener la fecha y hora actual
+  const downloadDate = new Date().toLocaleString().replace(/[\/:]/g, '-'); // Evita caracteres problemáticos en el nombre
+
+  // Filtrar wallets excluyendo la dirección del contrato de staking
+  const filteredWallets = uniqueWallets.filter(
+    (wallet) => wallet.wallet.toLowerCase() !== STAKING_CONTRACT.address.toLowerCase()
+  );
+
+  // Construir el contenido CSV
+  const csvContent = "data:text/csv;charset=utf-8," +
+    filteredWallets.map(wallet => wallet.wallet).join("\n"); // Solo las direcciones de wallets
+
+  // Crear el nombre del archivo con la fecha
+  const fileName = `ApeHands holders - ${downloadDate}.csv`;
+
+  // Generar y descargar el archivo CSV
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", fileName);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 
 
 
@@ -239,29 +284,11 @@ const totalWallets = uniqueWallets.length;
 
 
   return (
-    <section className="w-full h-full justify-center items-center bg-[#e8e8e8] text-black">
+    <section className="w-full h-full justify-center items-center bg-gradient-to-br from-blue-600 via-blue-400 to-white text-black">
       {/* Navbar */}
       <NavBar />
 
-      {/* Si no hay wallet conectada */}
-      {!account ? (
-        <div className="flex flex-col items-center h-screen justify-center font-lexend">
-          <h1 className="mb-[25px] text-lg">Connect your wallet</h1>
-          <div className="mb-[150px]">
-            <ConnectButton client={client} connectModal={{ size: "compact", showThirdwebBranding: false }} />
-          </div>
-        </div>
-) : !isAdmin ? (
-          /* Si la wallet conectada no es admin */
-        <div className="flex flex-col items-center h-screen justify-center font-lexend">
-          <h1 className="mb-[25px] text-lg">You are not the Admin</h1>
-          <button className="bg-[#212121] rounded-xl h-[50px] mb-[150px] text-white px-4">
-            <Link href={"/"}>Go to Home</Link>
-          </button>
-        </div>
-      ) : (
-        /* Si la wallet es admin */
-        <>
+      <>
               <div className="p-6">
 
                  {/* header */}
@@ -272,19 +299,20 @@ const totalWallets = uniqueWallets.length;
               <MediaRenderer
             client={client}
             src={contractMetadata?.image}
-            style={{borderRadius: "15px", width: "100px", height: "100px", marginBottom: "20px", marginRight: "20px"}}
+            style={{borderRadius: "15px", width: "100px", height: "100px", marginBottom: "20px", marginRight: "20px", border: '2px solid white'}}
 
             /> 
             <div>
-              <h1 className="text-black text-[42px] font-lexend font-light">{contractMetadata?.name}</h1>
+              <h1 className="text-white text-[42px] font-lexend font-bold">{contractMetadata?.name}</h1>
               <p className="text-black font-lexend">
                <a
                 href={`https://apescan.io/address/${handsContract.address}`} // Reemplázalo con la red que uses
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline text-blue-400 hover:opacity-75 cursor-pointer"
+                className="text-white hover:opacity-75 cursor-pointer"
               >
-                {contract.address}
+               <span>{handsContract.address}</span><span><FaArrowUpRightFromSquare /></span>  
+
               </a> 
               </p>
             </div>             
@@ -294,14 +322,26 @@ const totalWallets = uniqueWallets.length;
             </div>
             {/* header right side */}
 
-            <div className="relative inline-flex items-center justify-start gap-4 group">
-                <button
-                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-                  onClick={downloadCSV}
-                >
-                  Download CSV
-                </button>
-              </div>
+            <div className="relative inline-flex items-center justify-start gap-4 group font-lexend">
+  <button className="mt-4 bg-black text-white px-4 py-2 rounded"
+  >
+    Download ▼
+  </button>
+  <div className="absolute hidden group-hover:block bg-white shadow-md rounded mt-1 w-full z-10">
+    <button
+      className="block w-full text-left px-4 py-2 hover:bg-gray-200"
+      onClick={downloadCSV}
+    >
+      Details List
+    </button>
+    <button
+      className="block w-full text-left px-4 py-2 hover:bg-gray-200"
+      onClick={downloadCSVWallet}
+    >
+      Holder List
+    </button>
+  </div>
+</div>
   
               </div>
 
@@ -370,7 +410,7 @@ const totalWallets = uniqueWallets.length;
       <div className="mt-6">
       <p>
     <span className="text-5xl font-light tracking-tight text-black">
-    {totalWallets}
+    {totalWallets - 1}
     </span>
   </p>
       </div>
@@ -385,9 +425,8 @@ const totalWallets = uniqueWallets.length;
                   {/* ^^^ End div for cards ^^^ */}
 
 
-                <div className="p-6">
-  <h2>Lista de Wallets</h2>
-  <table className="min-w-full table-auto">
+                <div className="p-6 bg-white rounded-3xl font-lexend">
+  <table className="min-w-full table-auto ">
         <thead>
           <tr className="bg-gray-100">
             <th className="px-4 py-2 border">#</th>
@@ -398,9 +437,9 @@ const totalWallets = uniqueWallets.length;
           </tr>
         </thead>
         <tbody>
-          {uniqueWallets.map((wallet, index) => (
+        {filteredWallets.map((wallet, index) => (
             <tr key={wallet.wallet} className="border-b">
-              <td className="px-4 py-2">{wallet.index}</td>
+              <td className="px-4 py-2">{wallet.index - 1}</td>
               <td className="px-4 py-2">{wallet.wallet}</td>
               <td className="px-4 py-2">{wallet.nftCount}</td>
               <td className="px-4 py-2">{wallet.staked}</td>
@@ -411,14 +450,13 @@ const totalWallets = uniqueWallets.length;
       </table>
   </div>
 
+        <Footer/>
 
                 
   </div>
   
               
     </>
-
-      )}
     </section>
   );
 }

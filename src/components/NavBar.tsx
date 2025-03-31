@@ -58,27 +58,29 @@ export default function Navbar() {
               </Link>
           </section>
 
+          {account && (
           <section className="hidden lg:block">
               <NavRewards />
           </section>
+          )}
 
           {/* Menú grande */}
           <div className="flex items-center space-x-4 font-lexend font-bold">
               <div className="hidden sm:block">
-                  <a href="/" className="hover:bg-yellow-400 px-3 py-2 rounded-md">
-                      Home
-                  </a>
+                  
                   <a href="/mint" className="hover:bg-yellow-400 px-3 py-2 rounded-md">
                       Mint
                   </a>
                   <a href="/stake" className="hover:bg-yellow-400 px-3 py-2 rounded-md">
                       Stake
                   </a>
-                  {isAdmin && (
-                  <a href="/admin">
-                      Admin
+                  <a href="/smartwatch" className="hover:bg-yellow-400 px-3 py-2 rounded-md">
+                      Smartwatch
                   </a>
-                    )}
+                      
+                  <a href="/admin" className="hover:bg-yellow-400 px-3 py-2 rounded-md">
+                      Info
+                  </a>
               </div>
               <ConnectButton
                   client={client}
@@ -139,20 +141,22 @@ export default function Navbar() {
                       showThirdwebBranding: false,
                   }} />
                   </div>
-                      <a href="/" className="block text-lg px-4 py-2 font-lexend font-bold text-white hover:text-gray-400">
-                          Home
-                      </a>
+                      
                       <a href="/mint" className="block text-lg px-4 py-2 font-lexend font-bold text-white hover:text-gray-400">
                           Mint
                       </a>
                       <a href="/stake" className="block text-lg px-4 py-2 font-lexend font-bold text-white hover:text-gray-400">
                           Stake
                       </a>
-                      {isAdmin && (
-                  <a href="/admin">
-                      Admin
+
+                      <a href="/smartwatch" className="block text-lg px-4 py-2 font-lexend font-bold text-white hover:text-gray-400">
+                      Smartwatch
                   </a>
-                    )}
+                      
+                  <a href="/admin" className="block text-lg px-4 py-2 font-lexend font-bold text-white hover:text-gray-400">
+                      Info
+                  </a>
+                    
 
                   </div>
               </div>
@@ -193,7 +197,11 @@ export default function Navbar() {
 
 
       </nav>
+      {account && (
       <div className="block md:block lg:hidden">
-        <SubNavRewards /></div></>
+        <SubNavRewards /></div>
+        )}
+        </>
+      
   );
 }
