@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { NFT, prepareContractCall } from "thirdweb";
-import { getNFTs, ownerOf, totalSupply, getOwnedNFTs } from "thirdweb/extensions/erc721";
+import { getNFTs, ownerOf, totalSupply, getOwnedNFTs, balanceOf } from "thirdweb/extensions/erc721";
 import { useActiveAccount, useReadContract, useSendTransaction, TransactionButton } from "thirdweb/react";
 import { NFT_CONTRACT, STAKING_CONTRACT } from "../../utils/contracts";
 import Link from "next/link";
@@ -21,53 +21,83 @@ export const Staking = () => {
     const getOwnedNFTs = async () => {
         setIsLoading(true);
         let ownedNFTs: NFT[] = [];
-        
+    
         try {
             const totalNFTSupply = await totalSupply({ contract: NFT_CONTRACT });
-            const totalSupplyBigInt: bigint = BigInt(totalNFTSupply.toString()); // Convertir a bigint
-            
+            const totalSupplyBigInt = BigInt(totalNFTSupply.toString());
+    
+            console.log("Total supply:", totalSupplyBigInt.toString());
+    
+            const ownerPromises = [];
             for (let tokenId = BigInt(0); tokenId < totalSupplyBigInt; tokenId++) {
-                try {
-                    // Verificamos si el propietario es el que está conectado
-                    const owner = await ownerOf({
+                ownerPromises.push(
+                    ownerOf({
                         contract: NFT_CONTRACT,
                         tokenId: tokenId,
-                    });
-    
-                    if (owner === account?.address) {
-                        // Si la wallet es la propietaria, obtenemos la metadata del NFT
-                        const nft = await getNFTs({
-                            contract: NFT_CONTRACT,
-                            start: Number(tokenId),                            
-                            count: 1,  // Solo obtenemos ese NFT
-                        });
-    
-                        // Solo agregamos a la lista de ownedNFTs si fue encontrado
-                        if (nft && nft.length > 0) {
-                            ownedNFTs.push(nft[0]);
-                        }
-                    }
-                } catch (error) {
-                    // Si hay un error en la verificación del propietario o al obtener la metadata
-                    console.error(`Error fetching NFT with tokenId ${tokenId}:`, error);
-                }
+                    }).then((owner) => {
+                        console.log(`Token ID ${tokenId} - Owner: ${owner}`);
+                        return { tokenId, owner };
+                    })
+                    .catch((error) => {
+                        console.error(`Error fetching owner for token ${tokenId}:`, error);
+                        return null;
+                    })
+                );
             }
+    
+            const owners = await Promise.all(ownerPromises);
+    
+            console.log("Account address:", account?.address);
+            
+            // Filtrar los tokenIds que pertenecen al usuario
+            const ownedTokenIds = owners
+                .filter((result) => result && result.owner.toLowerCase() === account?.address?.toLowerCase()) 
+                .map((result) => Number(result!.tokenId));
+    
+            console.log("Owned token IDs:", ownedTokenIds);
+    
+            if (ownedTokenIds.length === 0) {
+                console.warn("⚠️ No NFTs found for this account.");
+                setOwnedNFTs([]);
+                setIsLoading(false);
+                return;
+            }
+    
+            // Obtener metadata de los NFTs
+            const metadataPromises = ownedTokenIds.map((tokenId) =>
+                getNFTs({
+                    contract: NFT_CONTRACT,
+                    start: tokenId,
+                    count: 1,
+                }).then((nfts) => {
+                    console.log(`Metadata for Token ID ${tokenId}:`, nfts);
+                    return nfts[0];
+                })
+                .catch((error) => {
+                    console.error(`Error fetching metadata for token ${tokenId}:`, error);
+                    return null;
+                })
+            );
+    
+            const metadataResults = await Promise.all(metadataPromises);
+            ownedNFTs = metadataResults.filter((nft) => nft !== null);
+    
+            console.log("Final Owned NFTs:", ownedNFTs);
     
             setOwnedNFTs(ownedNFTs);
         } catch (error) {
             console.error("Error fetching NFTs:", error);
         }
     
-        setIsLoading(false); // Desactivar loading después de la consulta
+        setIsLoading(false);
     };
-    
+
     useEffect(() => {
         if (account) {
             getOwnedNFTs();
         }
     }, [account]);
     
-
     
 
     const {
@@ -159,6 +189,7 @@ export const Staking = () => {
                     <div className="bg-white font-lexend text-black w-full h-auto shadow-[5px_5px_0px_0px_rgba(53,35,65)] border-4 border-solid border-[#352341] rounded-lg text-black p-16 lg:p-24 mb-7 flex flex-col">
                         <h2 className="mb-4 text-2xl font-bold">Backstage</h2>
                         <p className="mb-7">Here are your Apes waiting to jump on Main Stage.</p>
+                     
 
                         {ownedNFTs && ownedNFTs.length > 0 && !isApprovedForAll && (
         <div className="bg-yellow-100 text-yellow-800 p-4 rounded-md mb-4">

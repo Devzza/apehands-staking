@@ -227,12 +227,11 @@ const downloadImage = () => {
     <>  
     <div
         style={{width:"100%"}}
-        className="h-full bg-gradient-to-br from-blue-600 via-blue-400 to-white">
+        className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-400 to-white">
         
         <NavBar />
 
-        <div className="flex flex-col items-center font-lexend pt-7"></div>
-        <div>
+        <div className="flex flex-col items-center font-lexend pt-7 min-h-screen">
         <div className="flex flex-col justify-center items-center">
               <div className="flex flex-row gap-4 mb-4">
               <input
@@ -257,12 +256,19 @@ const downloadImage = () => {
 
             
       {metadata && isMinted && (
-                    <div className="mt-4">
+                    <div className="mt-4 px-6 flex flex-col justify-center items-center">
                       <h2 className="text-lg font-bold mb-4 font-lexend font-bold px-4">{metadata.name}</h2>
-                      <canvas ref={canvasRef} width="1000" height="1000" style={{ border: '1px solid black', width: '512px', height: '512px' }} />
-                            {/* Sección para seleccionar la imagen de superposición (smartwatch u otras) */}
+                      <canvas
+  ref={canvasRef}
+  width="1000"
+  height="1000"
+  style={{ border: '1px solid black' }}
+  className="w-full rounded-xl sm:w-96 md:w-512 sm:h-96 md:h-512"
+/>                            
+
+{/* Sección para seleccionar la imagen de superposición (smartwatch u otras) */}
       {/* Selector de smartwatch */}
-      <div className="bg-white p-4 font-lexend rounded-lg mt-4 mb-4 flex flex-col">
+      <div className="bg-white p-4 font-lexend rounded-lg w-full mt-4 mb-4 flex flex-col">
       <p className="mb-4 font-bold">Choose a smartwatch:</p>
       <select
     value={selectedSmartwatch}
@@ -278,7 +284,7 @@ const downloadImage = () => {
       </div>
 
 {/* Subir imagen para la pantalla */}
-<div className="bg-white p-4 font-lexend rounded-lg">
+<div className="bg-white p-4 font-lexend rounded-lg w-full">
   <p className="mb-4 font-bold">Upload an image for your smartwatch background:</p>
 <input type="file" onChange={handleImageUpload} accept="image/*" />
 </div>
@@ -286,7 +292,7 @@ const downloadImage = () => {
 
 
 {/* Botón Upload */}
-<div className="flex flex-col justify-center items-center mt-4">
+<div className="flex flex-col justify-center items-center mt-4 w-full">
 
   
 <button onClick={handleUpload} disabled={!imageFile} className="mb-2 p-2 rounded-lg bg-black text-white font-lexend w-full"
@@ -304,7 +310,7 @@ Download
 
 </div>
 
-<div className="bg-gradient-to-br from-yellow-200 to-yellow-400 p-12 font-lexend rounded-lg mt-4 mb-4 flex flex-col items-center">
+<div className="bg-gradient-to-br from-yellow-200 to-yellow-400 p-12 font-lexend rounded-lg mt-4 mb-4 flex flex-col items-center w-full">
   
       <p className="mb-4 text-black font-bold text-2xl">Grab some Ape hands!</p>
       <button className="mb-2 p-2 rounded-lg bg-black text-white font-lexend w-1/2"
