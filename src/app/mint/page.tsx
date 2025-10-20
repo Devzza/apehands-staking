@@ -61,8 +61,8 @@ export default function Claim() {
               <p>Loading...</p>
             ) : (
               <Image
-  src="/nft-preview.png"
-  alt="NFT preview"
+  src="/apehands-lasvegas.jpg"
+  alt="Apehands Las Vegas Edition"
   width={150}
   height={150}
   className="shadow-[5px_5px_0px_0px_rgba(0,0,0)]"
