@@ -14,9 +14,8 @@ import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { apechain } from "../apechain";
 import { useState } from "react";
-import Image from "next/image";
 
-export default function Claim1155() {
+export default function Claim() {
   const chain = defineChain(apechain);
   const account = useActiveAccount();
   const tokenId = BigInt(0); // ID del token ERC1155 a mintear
