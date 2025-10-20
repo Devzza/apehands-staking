@@ -14,6 +14,8 @@ import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { apechain } from "../apechain";
 import { useState } from "react";
+import Image from "next/image";
+
 
 export default function Claim() {
   const chain = defineChain(apechain);
@@ -58,18 +60,19 @@ export default function Claim() {
             {isContractMetadataLoading ? (
               <p>Loading...</p>
             ) : (
-              <MediaRenderer
-                client={client}
-  src={contractMetadata?.image?.replace("ipfs://", "https://ipfs.io/ipfs/")}
-                className="shadow-[5px_5px_0px_0px_rgba(0,0,0)]"
-                style={{
-                  borderRadius: "15px",
-                  border: "3px solid black",
-                  width: "150px",
-                  height: "150px",
-                  marginBottom: "20px",
-                }}
-              />
+              <Image
+  src="/nft-preview.png"
+  alt="NFT preview"
+  width={150}
+  height={150}
+  className="shadow-[5px_5px_0px_0px_rgba(0,0,0)]"
+  style={{
+    borderRadius: "15px",
+    border: "3px solid black",
+    marginBottom: "20px",
+    objectFit: "cover",
+  }}
+/>
             )}
 
             {/* Nombre */}
