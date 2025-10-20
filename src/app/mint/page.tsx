@@ -60,7 +60,7 @@ export default function Claim() {
             ) : (
               <MediaRenderer
                 client={client}
-                src={contractMetadata?.image}
+  src={contractMetadata?.image?.replace("ipfs://", "https://ipfs.io/ipfs/")}
                 className="shadow-[5px_5px_0px_0px_rgba(0,0,0)]"
                 style={{
                   borderRadius: "15px",
