@@ -20,7 +20,7 @@ import Image from "next/image";
 export default function Claim() {
   const chain = defineChain(apechain);
   const account = useActiveAccount();
-  const tokenId = BigInt(0); // ID del token ERC1155 a mintear
+  const tokenId = BigInt(1); // ID del token ERC1155 a mintear
   const [isMinting, setIsMinting] = useState(false);
 
   const contract = getContract({
@@ -61,8 +61,8 @@ export default function Claim() {
               <p>Loading...</p>
             ) : (
               <Image
-  src="/apehands-lasvegas.jpg"
-  alt="Apehands Las Vegas Edition"
+  src="/cakehand.jpg"
+  alt="Apehands 1st Anniversary"
   width={150}
   height={150}
   className="shadow-[5px_5px_0px_0px_rgba(0,0,0)]"
@@ -77,9 +77,9 @@ export default function Claim() {
 
             {/* Nombre */}
             <h2 className="mb-3 font-titan text-white text-3xl uppercase">
-              Apehands
+              Special Apehands
             </h2>
-            <h3 className="mb-3 text-white text-xl uppercase">Las Vegas Edition</h3>
+            <h3 className="mb-3 text-white text-xl uppercase">Cakehand - 1st Anniversary</h3>
 
             {/* Botón de minteo */}
             <div
