@@ -277,6 +277,11 @@ const downloadCSVWallet = () => {
 };
 
 
+const imageSrc =
+  typeof contractMetadata?.image === "string"
+    ? contractMetadata.image
+    : undefined;
+
 
 
 
@@ -298,7 +303,7 @@ const downloadCSVWallet = () => {
               <div className="flex flex-col lg:flex-row justify-start">
               <MediaRenderer
             client={client}
-            src={contractMetadata?.image}
+            src={imageSrc}
             style={{borderRadius: "15px", width: "100px", height: "100px", marginBottom: "20px", marginRight: "20px", border: '2px solid white'}}
 
             /> 
